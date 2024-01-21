@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const noteRouter = createTRPCRouter({
+
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -13,6 +14,23 @@ export const noteRouter = createTRPCRouter({
       });
     }),
 
+  update: protectedProcedure
+  .input(
+    z.object({ id: z.string(), title: z.string(), content: z.string() }))
+  .mutation(async ({ ctx, input }) => {
+    return await ctx.db.note.update({
+      where: {
+        id: input.id,
+      },
+      data:{
+        title: input.title,
+        content: input.content,
+      },
+    });
+  }),
+ 
+
+    
   create: protectedProcedure
     .input(
       z.object({ title: z.string(), content: z.string(), topicId: z.string() })
@@ -26,6 +44,7 @@ export const noteRouter = createTRPCRouter({
         },
       });
     }),
+
 
   getAll: protectedProcedure
     .input(z.object({ topicId: z.string() }))
